@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dummy SSW</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .wave-pattern {
+            background: linear-gradient(180deg, 
+                transparent 0%, 
+                transparent 30%, 
+                #dc3545 30%, 
+                #dc3545 40%, 
+                #28a745 40%, 
+                #28a745 60%, 
+                #8B4513 60%, 
+                #8B4513 100%);
+            height: 150px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-illustration {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="header-brand">
+                <img src="logo-surabaya.png" alt="Logo Surabaya" onerror="this.style.display='none'">
+                <h1 class="header-title">Surabaya Single Window</h1>
+            </div>
+            <nav class="header-nav">
+                <a href="#">Home</a>
+                <a href="#">Buat Permohonan</a>
+                <a href="#">Cek Data</a>
+            </nav>
+            <div class="header-status">
+                <div>
+                    <span>Koneksi:</span>
+                    <span id="status-koneksi" class="status-badge status-pending">Menunggu</span>
+                </div>
+                <div>
+                    <span>Auth:</span>
+                    <span id="status-autentikasi" class="status-badge status-pending">Menunggu</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+
+        <section id="langkah-1" class="step-section" style="background: white;">
+            <div class="content-wrapper" style="max-width: 1200px; padding: 3rem 2rem;">
+                <div id="hero-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                    <!-- Left: Illustration -->
+                    <div style="text-align: center;">
+                        <img src="laptop.jpg" alt="Ilustrasi Perizinan" class="hero-illustration" onerror="this.src='laptop.jpg'; this.onerror=function(){this.style.display='none'; this.nextElementSibling.style.display='block';}">
+                    </div>
+                    
+                    <!-- Right: Form -->
+                    <div class="card" style="box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                        <h2 style="font-size: 1.75rem; font-weight: 700; color: var(--warna-merah-brand); margin-bottom: 0.5rem; text-align: left;">Mencetak perizinan Anda secara mandiri</h2>
+                        <p style="color: var(--warna-teks-sekunder); margin-bottom: 2rem; text-align: left; font-size: 0.9rem;">Anda dapat mencetak Surat Keputusan, Surat Izin, Surat Rekomendasi secara mandiri *</p>
+                        <div>
+                            <label for="input-id-permohonan" class="form-label" style="text-align: left; font-weight: 600;">Masukkan ID Permohonan Anda</label>
+                            <input type="text" id="input-id-permohonan" class="form-input" placeholder="Contoh: 1140402" maxlength="10" style="text-align: left; font-size: 1rem;">
+                        </div>
+                        <div id="id-validation-message" class="hidden"></div>
+                        <div class="button-container" style="text-align: left; margin-top: 1.5rem;">
+                            <button id="btn-validasi-id" class="btn btn-primary">Validasi & Lanjutkan</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <style>
+            @media (max-width: 768px) {
+                #hero-grid {
+                    grid-template-columns: 1fr !important;
+                    gap: 2rem !important;
+                }
+                #hero-grid > div:first-child {
+                    display: none; /* Hide illustration on mobile */
+                }
+            }
+        </style>
+
+        <section id="langkah-1b" class="step-section hidden">
+            <div class="content-wrapper">
+                <div class="card" style="text-align: center;">
+                    <h2 class="card-title">Inisialisasi Sistem</h2>
+                    <p class="card-subtitle">Menghubungkan dengan backend GovChain...</p>
+                    <div id="init-status"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="langkah-2" class="step-section hidden">
+            <div class="content-wrapper" style="max-width: 800px;">
+                <div class="card">
+                    <h2 class="card-title" style="margin-bottom: 2rem;">Detail Permohonan Izin</h2>
+                    <div class="detail-grid">
+                        <div>
+                            <h3 id="permit-type" style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;"></h3>
+                            <div class="detail-list">
+                                <p><strong>ID Permohonan:</strong> <span id="app-id"></span></p>
+                                <p><strong>Nama Usaha:</strong> <span id="business-name"></span></p>
+                                <p><strong>Nama Pemilik:</strong> <span id="owner-name"></span></p>
+                                <p><strong>Alamat Usaha:</strong> <span id="business-address"></span></p>
+                                <p><strong>Dinas Terkait:</strong> <span id="department"></span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Alur Proses (5 Tahap)</h3>
+                            <div id="alur-proses-preview" style="font-size: 0.9rem; color: var(--warna-teks-sekunder);"></div>
+                        </div>
+                    </div>
+                    <div class="button-container">
+                        <button id="btn-mulai-proses" class="btn btn-primary" disabled>Mulai Proses di Blockchain</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="langkah-3" class="step-section hidden">
+            <div class="content-wrapper" style="max-width: 800px;">
+                <div class="card" style="padding: 2rem;">
+                     <h2 id="info-permit-name" class="card-title" style="font-size: 1.5rem; margin-bottom: 0.25rem;"></h2>
+                     <p id="info-current-status" class="card-subtitle" style="margin-bottom: 1.5rem;"></p>
+                </div>
+                
+                <!-- Progress Wizard Indicator -->
+                <div id="wizard-progress" class="progress-wizard">
+                    <!-- Will be populated by JS -->
+                </div>
+                
+                <!-- Single Active Stage Card Container -->
+                <div id="current-stage-card">
+                    <!-- Will be populated by showStageCard() -->
+                </div>
+            </div>
+        </section>
+
+        <section id="langkah-4" class="step-section hidden">
+            <div class="content-wrapper">
+                <div class="card" style="text-align: center;">
+                    <h2 class="card-title">Semua Tahap Selesai!</h2>
+                    <p class="card-subtitle">Gabungkan 5 NFT menjadi satu Sertifikat Izin Master.</p>
+                    <div class="button-container">
+                        <button id="btn-buat-master" class="btn btn-primary">Buat Master NFT Sertifikat</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="langkah-5" class="step-section hidden">
+            <div class="content-wrapper" style="max-width: 700px;">
+                <div class="card success-card" style="text-align: center;">
+                    <div class="success-icon">
+                        <svg fill="currentColor" viewBox="0 0 20 20" style="width: 2rem; height: 2rem;"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <h2 class="card-title" style="color: var(--warna-sukses);">Sertifikat Berhasil Diterbitkan!</h2>
+                    <p class="card-subtitle">Sertifikat Master NFT telah tervalidasi di blockchain.</p>
+                    
+                    <div class="result-box">
+                        <p><strong>Master Token ID:</strong> <span id="master-token-id" style="font-family: monospace; color: var(--warna-sukses);"></span></p>
+                        <p><strong>Transaction Hash:</strong> <span id="master-tx-hash" style="font-family: monospace; font-size: 0.8rem; color: var(--warna-teks-sekunder); word-break: break-all;"></span></p>
+                        <p><strong>Waktu Selesai:</strong> <span id="completion-time"></span></p>
+                    </div>
+                    
+                    <div id="qr-code-container" class="flex justify-center mb-4">
+                            <canvas id="qr-canvas" width="200" height="200" class="border-2 border-gray-200 rounded"></canvas>
+                        </div>
+
+                    <div class="button-container" style="display: flex; justify-content: center; gap: 1rem;">
+                        <button id="btn-download-qr" class="btn btn-secondary">Unduh QR</button>
+                        <button id="btn-reset" class="btn btn-primary">Mulai Baru</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        <p>Copyright &copy; 2025 - Dummy SSW Govchain</p>
+    </footer>
+
+    <div id="error-container"></div>
+</body>
+ <script type="module">
+        // === DATA ===
+        const SSW_SAMPLE_DATA = {
+          "metadata": {
+            "fetchDate": "2025-10-02T18:42:25.612Z",
+            "recordCount": 5,
+            "sampleId": 1140402,
+            "permitType": "Sertifikat Baru Standar Toko Obat",
+            "department": "Dinas Kesehatan",
+            "note": "Data asli diambil dari API SSW Surabaya - difilter ke 5 tahap kepala"
+          },
+          "sswData": [
+            { "id": 5191418, "id_t_permohonan_det": 1140402, "nm_opd": "Dinas Kesehatan", "nm_layanan": "Layanan Kesehatan", "nm_ijin": "Sertifikat Baru Standar Toko Obat", "dari_proses": "Proses Cek Berkas Petugas BO", "ke_proses": "Verifikasi Kepala Seksi/ Subkoordinator", "tgl_proses": "2025-03-24 09:44:58", "keterangan_proses": "ok", "stageMapping": "A-B", "businessData": { "businessName": "Apotek Sehat Sentosa", "businessType": "Apotek", "address": "Jl. Kesehatan No. 67, Kota Surabaya", "ownerName": "Apt. Budi Santoso, S.Farm", "department": "Dinas Kesehatan", "processType": "Layanan Kesehatan" }},
+            { "id": 5191499, "id_t_permohonan_det": 1140402, "nm_opd": "Dinas Kesehatan", "nm_layanan": "Layanan Kesehatan", "nm_ijin": "Sertifikat Baru Standar Toko Obat", "dari_proses": "Verifikasi Kepala Seksi/ Subkoordinator Setelah BAP/ Survey", "ke_proses": "Verifikasi Kepala Bidang", "tgl_proses": "2025-03-24 09:51:17", "keterangan_proses": "berkas sesuai", "stageMapping": "B-C", "businessData": { "businessName": "Apotek Sehat Sentosa", "businessType": "Apotek", "address": "Jl. Kesehatan No. 67, Kota Surabaya", "ownerName": "Apt. Budi Santoso, S.Farm", "department": "Dinas Kesehatan", "processType": "Layanan Kesehatan" }},
+            { "id": 5191513, "id_t_permohonan_det": 1140402, "nm_opd": "Dinas Kesehatan", "nm_layanan": "Layanan Kesehatan", "nm_ijin": "Sertifikat Baru Standar Toko Obat", "dari_proses": "Verifikasi Kepala Bidang", "ke_proses": "Verifikasi Sekretaris", "tgl_proses": "2025-03-24 09:52:28", "keterangan_proses": "berkas lengkap", "stageMapping": "C-D", "businessData": { "businessName": "Apotek Sehat Sentosa", "businessType": "Apotek", "address": "Jl. Kesehatan No. 67, Kota Surabaya", "ownerName": "Apt. Budi Santoso, S.Farm", "department": "Dinas Kesehatan", "processType": "Layanan Kesehatan" }},
+            { "id": 5191518, "id_t_permohonan_det": 1140402, "nm_opd": "Dinas Kesehatan", "nm_layanan": "Layanan Kesehatan", "nm_ijin": "Sertifikat Baru Standar Toko Obat", "dari_proses": "Verifikasi Sekretaris", "ke_proses": "Verifikasi Kepala Dinas", "tgl_proses": "2025-03-24 09:53:02", "keterangan_proses": "berkas lengkap", "stageMapping": "D-E", "businessData": { "businessName": "Apotek Sehat Sentosa", "businessType": "Apotek", "address": "Jl. Kesehatan No. 67, Kota Surabaya", "ownerName": "Apt. Budi Santoso, S.Farm", "department": "Dinas Kesehatan", "processType": "Layanan Kesehatan" }},
+            { "id": 5191652, "id_t_permohonan_det": 1140402, "nm_opd": "Dinas Kesehatan", "nm_layanan": "Layanan Kesehatan", "nm_ijin": "Sertifikat Baru Standar Toko Obat", "dari_proses": "Verifikasi Kepala Dinas", "ke_proses": "Berkas Dinyatakan Selesai ( SK telah Terbit )", "tgl_proses": "2025-03-24 10:02:56", "keterangan_proses": "ok", "stageMapping": "E-F", "businessData": { "businessName": "Apotek Sehat Sentosa", "businessType": "Apotek", "address": "Jl. Kesehatan No. 67, Kota Surabaya", "ownerName": "Apt. Budi Santoso, S.Farm", "department": "Dinas Kesehatan", "processType": "Layanan Kesehatan" }}
+          ]
+        };
+        window.SSW_SAMPLE_DATA = SSW_SAMPLE_DATA;
+        
+        // === UI CONTROLLER ===
+        const uiController = {
+            showStep(stepId) {
+                ['langkah-1', 'langkah-1b', 'langkah-2', 'langkah-3', 'langkah-4', 'langkah-5'].forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(stepId).classList.remove('hidden');
+            },
+            updateStatus(elementId, status, text) {
+                const el = document.getElementById(elementId);
+                el.className = 'status-badge';
+                if (status === 'sukses') {
+                    el.classList.add('status-terhubung');
+                    el.textContent = text || 'Terhubung';
+                } else if (status === 'error') {
+                    el.classList.add('status-error');
+                    el.textContent = text || 'Gagal';
+                } else {
+                    el.classList.add('status-pending');
+                    el.textContent = text || 'Menunggu';
+                }
+            },
+            renderApplicationData(data) {
+                document.getElementById('app-id').textContent = data.metadata.sampleId;
+                document.getElementById('permit-type').textContent = data.metadata.permitType;
+                document.getElementById('business-name').textContent = data.sswData[0].businessData.businessName;
+                document.getElementById('owner-name').textContent = data.sswData[0].businessData.ownerName;
+                document.getElementById('business-address').textContent = data.sswData[0].businessData.address;
+                document.getElementById('department').textContent = data.metadata.department;
+
+                const previewContainer = document.getElementById('alur-proses-preview');
+                previewContainer.innerHTML = '';
+                data.sswData.forEach((tahap, index) => {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<strong>Tahap ${index + 1}:</strong> ${tahap.dari_proses} &rarr; ${tahap.ke_proses}`;
+                    previewContainer.appendChild(p);
+                });
+            },
+            renderProcessSteps(steps) {
+                const container = document.getElementById('daftar-tahap-proses');
+                container.innerHTML = '';
+                steps.forEach((step, index) => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'step-indicator';
+                    stepEl.id = `step-${step.stageMapping}`;
+                    stepEl.innerHTML = `
+                        <div class="step-icon"><span>${index + 1}</span></div>
+                        <div class="ml-4">
+                            <h4 class="font-bold text-gray-800">${step.stageMapping}: ${step.ke_proses}</h4>
+                            <p class="text-sm text-gray-500">${step.dari_proses}</p>
+                            <div class="text-xs mt-2 space-y-1 hidden">
+                                <p><strong>Token ID:</strong> <span class="font-mono token-id"></span></p>
+                                <p><strong>Tx Hash:</strong> <span class="font-mono tx-hash"></span></p>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(stepEl);
+                });
+            },
+            updateStepStatus(stageMapping, status, data = {}) {
+                const stepEl = document.getElementById(`step-${stageMapping}`);
+                const iconEl = stepEl.querySelector('.step-icon');
+                const detailEl = stepEl.querySelector('.text-xs');
+                
+                iconEl.className = 'step-icon'; // reset
+                iconEl.innerHTML = '';
+                
+                if(status === 'memproses') {
+                    iconEl.classList.add('memproses');
+                    iconEl.innerHTML = '🔄';
+                } else if (status === 'selesai') {
+                    iconEl.classList.add('sukses');
+                    iconEl.innerHTML = '✓';
+                    detailEl.classList.remove('hidden');
+                    detailEl.querySelector('.token-id').textContent = data.tokenId ? `#${data.tokenId}` : 'Processing...';
+                    detailEl.querySelector('.tx-hash').textContent = data.txHash && data.txHash.length > 12 ? `${data.txHash.substring(0,12)}...` : (data.txHash || 'Pending...');
+                } else if (status === 'error') {
+                    iconEl.classList.add('gagal');
+                    iconEl.innerHTML = '✕';
+                    detailEl.classList.remove('hidden');
+                    detailEl.innerHTML = `<p class="text-red-600"><strong>Error:</strong> ${data.error}</p>`;
+                }
+            },
+            updateProgressBar(percentage) {
+                const bar = document.getElementById('progress-bar');
+                bar.style.width = `${percentage}%`;
+                bar.textContent = `${Math.round(percentage)}%`;
+            },
+            renderFinalResult(result) {
+                // Handle both direct result and nested data responses
+                const data = result.data || result;
+                const masterTokenId = data.tokenId || data.masterTokenId || data.id;
+                const txHash = data.transactionHash || data.txHash || data.hash || data.tx;
+                
+                console.log('Final result data:', JSON.stringify({
+                    fullResult: result,
+                    extractedData: { masterTokenId, txHash }
+                }, null, 2));
+                
+                // Update text content - only access existing elements
+                const masterTokenElement = document.getElementById('master-token-id');
+                if (masterTokenElement) {
+                    masterTokenElement.textContent = masterTokenId ? `#${masterTokenId}` : 'Processing...';
+                }
+                
+                const masterTxHashElement = document.getElementById('master-tx-hash');
+                if (masterTxHashElement) {
+                    masterTxHashElement.textContent = txHash ? `${txHash.substring(0, 20)}...` : 'Processing...';
+                }
+                
+                const completionTimeElement = document.getElementById('completion-time');
+                if (completionTimeElement) {
+                    completionTimeElement.textContent = new Date().toLocaleString('id-ID');
+                }
+                
+                // Generate QR Code
+                this.generateQRCode(masterTokenId, txHash);
+                
+                // Bind button events
+                this.bindFinalResultEvents(txHash);
+            },
+            showError(message, options = {}) {
+                const errorContainer = document.getElementById('error-container');
+                const errorEl = document.createElement('div');
+                errorEl.className = 'error-alert';
+                errorEl.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="text-2xl mr-3">⚠️</div>
+                        <div>
+                            <h4 class="font-bold">Terjadi Kesalahan</h4>
+                            <p class="text-sm text-gray-600">${message}</p>
+                        </div>
+                         <button onclick="this.parentElement.parentElement.remove()" class="ml-auto text-gray-500 hover:text-gray-800">&times;</button>
+                    </div>
+                `;
+                errorContainer.appendChild(errorEl);
+                setTimeout(() => errorEl.remove(), 10000);
+            },
+
+            generateQRCode(masterTokenId, txHash) {
+                if (!masterTokenId) {
+                    console.warn('masterTokenId is missing, skipping QR generation');
+                    return;
+                }
+                
+                const qrData = {
+                    tokenId: masterTokenId.toString(),
+                    contract: "0x8464135c8F25Da09e49BC8782676a84730C318bC",
+                    chainId: "31337"
+                };
+                
+                console.log('Generating QR with data:', qrData);
+                
+                const qrContainer = document.getElementById('qr-code-container');
+                if (!qrContainer) {
+                    console.error('QR container not found');
+                    return;
+                }
+                
+                qrContainer.innerHTML = '';
+                
+                const tryGenerateQR = (attempts = 0) => {
+                    if (typeof QRious !== 'undefined') {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            const qr = new QRious({
+                                element: canvas,
+                                value: JSON.stringify(qrData),
+                                size: 128,
+                                background: '#ffffff',
+                                foreground: '#000000'
+                            });
+                            canvas.className = 'rounded border';
+                            qrContainer.appendChild(canvas);
+                            console.log('QR Code generated successfully');
+                        } catch (error) {
+                            console.error('QR Code generation error:', error);
+                            qrContainer.innerHTML = '<div class="w-32 h-32 bg-gray-200 flex items-center justify-center text-gray-500 text-xs">QR Error</div>';
+                        }
+                    } else if (attempts < 5) {
+                        console.warn(`QRious library not loaded yet, retry ${attempts + 1}/5`);
+                        setTimeout(() => tryGenerateQR(attempts + 1), 500);
+                    } else {
+                        console.error('QRious library not loaded after 5 attempts');
+                        qrContainer.innerHTML = '<div class="w-32 h-32 bg-gray-200 flex items-center justify-center text-gray-500 text-xs">QR Library Error</div>';
+                    }
+                };
+                
+                tryGenerateQR();
+            },
+
+            bindFinalResultEvents(txHash) {
+                const explorerBtn = document.getElementById('btn-blockchain-explorer');
+                if (explorerBtn) {
+                    explorerBtn.addEventListener('click', () => {
+                        if (txHash) {
+                            window.open(`https://custom-block-explorer.vercel.app/tx/${txHash}`, '_blank');
+                        } else {
+                            this.showError('Transaction hash tidak tersedia');
+                        }
+                    });
+                }
+                
+                const downloadBtn = document.getElementById('btn-download-qr');
+                if (downloadBtn) {
+                    downloadBtn.addEventListener('click', () => {
+                        const canvas = document.querySelector('#qr-code-container canvas');
+                        if (canvas) {
+                            const link = document.createElement('a');
+                            link.download = 'govchain-permit-qr.png';
+                            link.href = canvas.toDataURL();
+                            link.click();
+                        } else {
+                            this.showError('QR Code belum tersedia');
+                        }
+                    });
+                }
+            }
+        };
+
+        // === DATA PROCESSOR ===
+        const dataProcessor = {
+            createMintPayload(tahap, parentTokenId) {
+                const payload = {
+                    stageType: tahap.stageMapping,
+                    processData: {
+                        submissionId: `SSW-${tahap.id_t_permohonan_det}`,
+                        applicantData: {
+                            businessName: tahap.businessData.businessName,
+                            businessType: tahap.businessData.businessType,
+                            address: tahap.businessData.address,
+                            ownerName: tahap.businessData.ownerName,
+                            validationStage: `${tahap.dari_proses} → ${tahap.ke_proses}`
+                        }
+                    },
+                    metadata: {
+                        department: tahap.nm_opd,
+                        processType: tahap.nm_layanan,
+                        permitType: tahap.nm_ijin,
+                        processDate: tahap.tgl_proses,
+                        processNotes: tahap.keterangan_proses,
+                        sswReference: tahap.id_t_permohonan_det
+                    }
+                };
+                
+                if (parentTokenId && parentTokenId !== null && parentTokenId !== undefined) {
+                    payload.parentTokenId = parentTokenId;
+                }
+                
+                console.log(`Creating payload for ${tahap.stageMapping}:`, JSON.stringify({
+                    stageType: payload.stageType,
+                    parentTokenId: payload.parentTokenId || 'NULL',
+                    hasParent: !!payload.parentTokenId
+                }, null, 2));
+                return payload;
+            },
+            createMasterNFTPayload(childTokenIds, sswData) {
+                const validTokenIds = childTokenIds.filter(id => id && id !== null && id !== undefined);
+                const payload = {
+                    processId: `PROC-${sswData.metadata.sampleId}`,
+                    chainTokenIds: validTokenIds,
+                    processData: {
+                        permitTitle: sswData.metadata.permitType,
+                        businessName: sswData.sswData[0].businessData.businessName,
+                        department: sswData.metadata.department,
+                        totalStages: sswData.sswData.length,
+                        stagesCompleted: validTokenIds.length
+                    },
+                    metadata: {
+                        completionDate: new Date().toISOString(),
+                        source: 'dummy-ssw',
+                        version: '1.0.0'
+                    }
+                };
+                console.log('Master NFT Payload:', JSON.stringify(payload, null, 2));
+                return payload;
+            }
+        };
+
+        // === API CLIENT ===
+        const apiClient = {
+            BASE_URL: 'http://localhost:3000/api/v1',
+            async getAuthToken() {
+                const response = await fetch(`${this.BASE_URL}/auth/generate-key`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (!response.ok) throw new Error('Gagal mendapatkan token autentikasi.');
+                return await response.json();
+            },
+            async mintStageNFT(payload) {
+                const token = sessionStorage.getItem('govchain-jwt');
+                const response = await fetch(`${this.BASE_URL}/process/mint`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                return await response.json();
+            },
+            async mintMasterNFT(payload) {
+                const token = sessionStorage.getItem('govchain-jwt');
+                const response = await fetch(`${this.BASE_URL}/process/mint-master`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`HTTP ${response.status}: ${errorData.error || errorData.message || 'Unknown error'}`);
+                }
+                
+                return await response.json();
+            }
+        };
+        
+        // === APP CLASS ===
+        class App {
+            constructor() {
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                document.getElementById('btn-validasi-id').addEventListener('click', this.validateIdPermohonan.bind(this));
+                document.getElementById('input-id-permohonan').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.validateIdPermohonan();
+                    }
+                });
+                document.getElementById('btn-mulai-proses').addEventListener('click', this.startBlockchainProcess.bind(this));
+                document.getElementById('btn-buat-master').addEventListener('click', this.createMasterNFT.bind(this));
+                document.getElementById('btn-reset').addEventListener('click', this.resetApplication.bind(this));
+            }
+            
+            delay(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            validateIdPermohonan() {
+                const inputElement = document.getElementById('input-id-permohonan');
+                const messageElement = document.getElementById('id-validation-message');
+                const btnElement = document.getElementById('btn-validasi-id');
+                
+                const inputId = inputElement.value.trim();
+                messageElement.classList.add('hidden');
+                
+                if (!inputId) {
+                    this.showValidationMessage('Mohon masukkan ID Permohonan', 'error');
+                    return;
+                }
+                
+                const sswData = window.SSW_SAMPLE_DATA;
+                const isValidId = sswData.metadata.sampleId.toString() === inputId;
+                
+                if (isValidId) {
+                    this.showValidationMessage('✅ ID Valid! Melanjutkan ke inisialisasi sistem...', 'success');
+                    btnElement.disabled = true;
+                    btnElement.textContent = 'Memvalidasi...';
+                    
+                    setTimeout(() => {
+                        this.initializeSystem();
+                    }, 1500);
+                } else {
+                    this.showValidationMessage('❌ ID tidak ditemukan dalam sistem SSW', 'error');
+                }
+            }
+            
+            showValidationMessage(message, type) {
+                const messageElement = document.getElementById('id-validation-message');
+                messageElement.classList.remove('hidden');
+                
+                if (type === 'success') {
+                    messageElement.className = 'mb-4 text-center p-3 bg-green-100 border border-green-300 text-green-700 rounded-lg';
+                } else {
+                    messageElement.className = 'mb-4 text-center p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg';
+                }
+                
+                messageElement.textContent = message;
+            }
+
+            async initializeSystem() {
+                uiController.showStep('langkah-1b');
+
+                try {
+                    uiController.updateStatus('status-autentikasi', 'memproses', 'Meminta...');
+                    const tokenData = await apiClient.getAuthToken();
+                    if (tokenData.success && tokenData.data && tokenData.data.apiKey) {
+                        sessionStorage.setItem('govchain-jwt', tokenData.data.apiKey);
+                        uiController.updateStatus('status-autentikasi', 'sukses', 'Terautentikasi');
+                        uiController.updateStatus('status-koneksi', 'sukses', 'Terhubung');
+                    } else {
+                        throw new Error("Token tidak diterima dari backend.");
+                    }
+
+                    const sswData = window.SSW_SAMPLE_DATA;
+                    uiController.renderApplicationData(sswData);
+                    document.getElementById('btn-mulai-proses').disabled = false;
+                    
+                    await this.delay(1000);
+                    uiController.showStep('langkah-2');
+                } catch (error) {
+                    uiController.updateStatus('status-koneksi', 'error');
+                    uiController.updateStatus('status-autentikasi', 'error');
+                    uiController.showError(`Gagal menginisialisasi sistem: ${error.message}. Pastikan backend GovChain berjalan.`);
+                    
+                    setTimeout(() => {
+                        uiController.showStep('langkah-1');
+                        document.getElementById('btn-validasi-id').disabled = false;
+                        document.getElementById('btn-validasi-id').textContent = 'Validasi & Lanjutkan';
+                    }, 3000);
+                }
+            }
+            
+            async startBlockchainProcess() {
+                const sswDataArray = window.SSW_SAMPLE_DATA.sswData;
+                const sswData = window.SSW_SAMPLE_DATA;
+                
+                this.sswStages = sswDataArray;
+                this.currentStageIndex = 0;
+                this.processedTokens = [];
+                
+                document.getElementById('info-permit-name').textContent = sswData.metadata.permitType;
+                document.getElementById('info-current-status').textContent = 'Status: Siap memulai tahap A-B (1/5)';
+                
+                uiController.showStep('langkah-3');
+                
+                this.initializeWizardProgress();
+                this.showStageCard(0);
+            }
+
+            async createMasterNFT() {
+                const btn = document.getElementById('btn-buat-master');
+                btn.disabled = true;
+                btn.textContent = 'Membuat Master NFT...';
+
+                try {
+                    const processedTokens = JSON.parse(sessionStorage.getItem('processed-tokens') || '[]');
+                    
+                    if (!processedTokens || processedTokens.length === 0) {
+                        throw new Error('Tidak ada token tahapan yang tersimpan. Silakan ulangi proses dari awal.');
+                    }
+                    
+                    const sswData = window.SSW_SAMPLE_DATA;
+                    const payload = dataProcessor.createMasterNFTPayload(processedTokens, sswData);
+                    
+                    console.log('Sending Master NFT request with payload:', JSON.stringify(payload, null, 2));
+                    
+                    const result = await apiClient.mintMasterNFT(payload);
+                    
+                    console.log('Master NFT API response:', JSON.stringify(result, null, 2));
+                    
+                    if (result.success) {
+                        uiController.renderFinalResult(result);
+                        uiController.showStep('langkah-5');
+                        
+                        // Notify dashboard untuk auto-refresh
+                        this.notifyDashboard(result);
+                        
+                        // Store data for potential future use
+                        if (result.data?.ipfsUrl) {
+                            sessionStorage.setItem('govchain-detail-url', result.data.ipfsUrl);
+                        }
+                    } else {
+                        throw new Error(result.error || result.message || 'Pembuatan Master NFT di backend gagal.');
+                    }
+                } catch (error) {
+                    console.error('Master NFT creation error:', error);
+                    uiController.showError(`Gagal membuat Master NFT: ${error.message}`);
+                    btn.disabled = false;
+                    btn.textContent = 'Coba Lagi Buat Master NFT';
+                }
+            }
+
+            notifyDashboard(masterResult) {
+                try {
+                    // Extract data dari berbagai format response
+                    const data = masterResult.data || masterResult;
+                    const tokenId = data.tokenId || data.masterTokenId || data.id;
+                    const txHash = data.transactionHash || data.txHash || data.hash;
+                    
+                    const eventData = {
+                        type: 'ssw-master-minted',
+                        tokenId: tokenId,
+                        txHash: txHash,
+                        processId: data.processId,
+                        chainTokenIds: data.chainTokenIds || [],
+                        timestamp: new Date().toISOString(),
+                        source: 'dummy-ssw'
+                    };
+                    
+                    // 1. LocalStorage event untuk cross-tab communication
+                    localStorage.setItem('ssw-minted', JSON.stringify(eventData));
+                    setTimeout(() => localStorage.removeItem('ssw-minted'), 1000);
+                    
+                    // 2. Custom event untuk same-window communication
+                    window.dispatchEvent(new CustomEvent('nft-minted', {
+                        detail: eventData
+                    }));
+                    
+                    // 3. Also trigger storage event manually
+                    window.dispatchEvent(new StorageEvent('storage', {
+                        key: 'ssw-minted',
+                        newValue: JSON.stringify(eventData),
+                        url: window.location.href
+                    }));
+                    
+                    console.log('✅ Dashboard notified successfully:', eventData);
+                    
+                } catch (error) {
+                    console.warn('⚠️ Failed to notify dashboard:', error);
+                }
+            }
+
+            initializeWizardProgress() {
+                const progressContainer = document.getElementById('wizard-progress');
+                const stages = ['A-B', 'B-C', 'C-D', 'D-E', 'E-F'];
+                
+                let html = '';
+                stages.forEach((stageName, index) => {
+                    const isActive = index === this.currentStageIndex;
+                    const isCompleted = index < this.currentStageIndex;
+                    const stateClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
+                    
+                    html += `
+                        <div class="wizard-step ${stateClass}" id="wizard-step-${index}">
+                            <div class="wizard-dot">${index + 1}</div>
+                            <div class="wizard-label">${stageName}</div>
+                        </div>
+                    `;
+                    
+                    if (index < stages.length - 1) {
+                        const connectorClass = isCompleted ? 'completed' : '';
+                        html += `<div class="wizard-connector ${connectorClass}" id="wizard-connector-${index}"></div>`;
+                    }
+                });
+                
+                progressContainer.innerHTML = html;
+            }
+            
+            updateWizardProgress() {
+                const stages = ['A-B', 'B-C', 'C-D', 'D-E', 'E-F'];
+                
+                stages.forEach((stageName, index) => {
+                    const stepEl = document.getElementById(`wizard-step-${index}`);
+                    const connectorEl = document.getElementById(`wizard-connector-${index}`);
+                    
+                    // Remove all state classes
+                    stepEl.classList.remove('active', 'completed');
+                    
+                    // Add appropriate class
+                    if (index < this.currentStageIndex) {
+                        stepEl.classList.add('completed');
+                        if (connectorEl) connectorEl.classList.add('completed');
+                    } else if (index === this.currentStageIndex) {
+                        stepEl.classList.add('active');
+                    } else {
+                        if (connectorEl) connectorEl.classList.remove('completed');
+                    }
+                });
+            }
+            
+            showStageCard(stageIndex) {
+                const container = document.getElementById('current-stage-card');
+                const stage = this.sswStages[stageIndex];
+                const parentTokenId = stageIndex === 0 ? null : this.processedTokens[stageIndex - 1];
+                const isLastStage = stageIndex === this.sswStages.length - 1;
+                
+                const cardHtml = `
+                    <div class="card" style="animation: slideIn 0.4s ease-out;">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="flex-1">
+                                <h3 class="text-xl font-bold mb-1" style="color: var(--warna-merah-brand);">Tahap ${stage.stageMapping} (${stageIndex + 1}/5)</h3>
+                                <p class="text-sm text-gray-600 mb-2">${stage.dari_proses} → ${stage.ke_proses}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-2">Detail Proses:</h4>
+                                <div class="text-sm space-y-1">
+                                    <p><strong>Tanggal:</strong> ${stage.tgl_proses}</p>
+                                    <p><strong>Keterangan:</strong> ${stage.keterangan_proses}</p>
+                                    <p><strong>Dinas:</strong> ${stage.nm_opd}</p>
+                                    ${parentTokenId ? `<p><strong>Parent Token:</strong> #${parentTokenId}</p>` : '<p><strong>Parent Token:</strong> Tidak ada (tahap pertama)</p>'}
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h4 class="font-medium text-gray-700 mb-2">Data Bisnis:</h4>
+                                <div class="text-sm space-y-1">
+                                    <p><strong>Nama Usaha:</strong> ${stage.businessData.businessName}</p>
+                                    <p><strong>Pemilik:</strong> ${stage.businessData.ownerName}</p>
+                                    <p><strong>Alamat:</strong> ${stage.businessData.address}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Processing State -->
+                        <div id="current-processing" class="mb-4 text-center hidden">
+                            <div class="flex items-center justify-center space-x-2 p-3 bg-blue-50 rounded">
+                                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                <span class="text-blue-600">Memproses ke blockchain...</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Success Result -->
+                        <div id="current-result" class="mb-4 hidden">
+                            <div class="bg-green-50 border border-green-200 rounded p-4">
+                                <h5 class="font-bold text-green-700 mb-2">✅ Berhasil Didaftarkan!</h5>
+                                <div class="text-sm space-y-1">
+                                    <p><strong>Token ID:</strong> <span class="font-mono" id="current-token-id"></span></p>
+                                    <p><strong>Transaction Hash:</strong> <span class="font-mono text-xs" id="current-tx-hash"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="button-container" style="display: flex; gap: 1rem; justify-content: center;">
+                            <button id="btn-process-current-stage" class="btn btn-primary">
+                                Daftarkan ke Blockchain
+                            </button>
+                            <button id="btn-next-stage" class="btn btn-secondary hidden">
+                                ${isLastStage ? 'Selesaikan Proses →' : 'Lanjut ke Tahap Berikutnya →'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML = cardHtml;
+                
+                document.getElementById('btn-process-current-stage').addEventListener('click', () => this.processCurrentStage());
+                document.getElementById('btn-next-stage').addEventListener('click', () => this.handleNextStage());
+            }
+            
+            async processCurrentStage() {
+                const currentStage = this.sswStages[this.currentStageIndex];
+                const parentTokenId = this.currentStageIndex === 0 ? null : this.processedTokens[this.currentStageIndex - 1];
+                
+                const processBtn = document.getElementById('btn-process-current-stage');
+                const processingDiv = document.getElementById('current-processing');
+                const resultDiv = document.getElementById('current-result');
+                const nextBtn = document.getElementById('btn-next-stage');
+                
+                processBtn.disabled = true;
+                processBtn.textContent = 'Memproses...';
+                processingDiv.classList.remove('hidden');
+                resultDiv.classList.add('hidden');
+                
+                try {
+                    const payload = dataProcessor.createMintPayload(currentStage, parentTokenId);
+                    const result = await apiClient.mintStageNFT(payload);
+                    
+                    if (result.success) {
+                        const tokenId = result.tokenId || result.data?.tokenId || result.nftId || result.id;
+                        const txHash = result.txHash || result.transactionHash || result.hash || result.tx;
+                        
+                        this.processedTokens[this.currentStageIndex] = tokenId;
+                        
+                        processingDiv.classList.add('hidden');
+                        resultDiv.classList.remove('hidden');
+                        document.getElementById('current-token-id').textContent = `#${tokenId}`;
+                        document.getElementById('current-tx-hash').textContent = txHash && txHash.length > 12 ? `${txHash.substring(0,12)}...` : (txHash || 'Pending...');
+                        
+                        processBtn.classList.add('hidden');
+                        nextBtn.classList.remove('hidden');
+                        
+                        this.updateCurrentStatusInfo();
+                        
+                    } else {
+                        throw new Error(result.error || 'Proses minting di backend gagal.');
+                    }
+                    
+                } catch (error) {
+                    processingDiv.classList.add('hidden');
+                    processBtn.disabled = false;
+                    processBtn.textContent = 'Daftarkan ke Blockchain';
+                    uiController.showError(`Gagal memproses tahap ${currentStage.stageMapping}: ${error.message}`);
+                }
+            }
+            
+            handleNextStage() {
+                const isLastStage = this.currentStageIndex === this.sswStages.length - 1;
+                
+                if (isLastStage) {
+                    sessionStorage.setItem('processed-tokens', JSON.stringify(this.processedTokens));
+                    uiController.showStep('langkah-4');
+                } else {
+                    this.currentStageIndex++;
+                    this.updateWizardProgress();
+                    this.showStageCard(this.currentStageIndex);
+                    this.updateCurrentStatusInfo();
+                }
+            }
+            
+            updateCurrentStatusInfo() {
+                const totalStages = this.sswStages.length;
+                const completedCount = this.processedTokens.filter(t => t).length;
+                
+                let statusText = '';
+                if (completedCount === 0) {
+                    statusText = 'Status: Siap memulai tahap A-B (1/5)';
+                } else if (completedCount === totalStages) {
+                    statusText = 'Status: Semua tahap selesai! Siap membuat Master NFT';
+                } else {
+                    const currentStageName = this.sswStages[this.currentStageIndex].stageMapping;
+                    statusText = `Status: ${completedCount}/${totalStages} selesai, saat ini tahap ${currentStageName}`;
+                }
+                
+                document.getElementById('info-current-status').textContent = statusText;
+            }
+            
+            getStageStatusBadge(status) {
+                switch(status) {
+                    case 'processing':
+                        return '<span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">Memproses</span>';
+                    case 'done':
+                        return '<span class="px-3 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Selesai</span>';
+                    default:
+                        return '<span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">Siap</span>';
+                }
+            }
+            
+            generateProcessTimeline() {
+                const timelineContainer = document.getElementById('process-timeline');
+                if (!timelineContainer) return;
+                const stages = [
+                    { id: 'A-B', label: 'Pemeriksaan (BAP)', date: '25 Agustus 2025', status: 'completed' },
+                    { id: 'B-C', label: 'Pemeriksaan Dinas', date: '25 Agustus 2025', status: 'completed' },
+                    { id: 'C-D', label: 'Verifikasi Kepala Dinas', date: '25 Agustus 2025', status: 'completed' },
+                    { id: 'D-E', label: 'Persetujuan DPRD/LSP', date: '25 Agustus 2025', status: 'completed' },
+                    { id: 'E-F', label: 'Berkas Selesai (SK Terbit)', date: '25 Agustus 2025', status: 'completed' }
+                ];
+                
+                let timelineHtml = '<div class="flex items-center justify-between relative">';
+                timelineHtml += '<div class="absolute top-4 left-8 right-8 h-0.5 bg-green-300"></div>';
+                
+                stages.forEach((stage, index) => {
+                    const isLast = index === stages.length - 1;
+                    
+                    timelineHtml += `
+                        <div class="flex flex-col items-center relative z-10 ${isLast ? '' : 'flex-1'}">
+                            <div class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div class="text-center max-w-24">
+                                <div class="text-xs font-semibold text-gray-800 mb-1">${stage.label}</div>
+                                <div class="text-xs text-gray-500">${stage.date}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (!isLast) {
+                        timelineHtml += '<div class="flex-1"></div>';
+                    }
+                });
+                
+                timelineHtml += '</div>';
+                
+                timelineContainer.innerHTML = `
+                    <div class="overflow-x-auto">
+                        <div class="min-w-full">
+                            ${timelineHtml}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            resetApplication() {
+                sessionStorage.clear();
+                location.reload();
+            }
+        }
+
+        
+        
+        new App();
+ </script>
+</body>
+</html>
+

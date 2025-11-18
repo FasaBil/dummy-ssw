@@ -1,0 +1,94 @@
+{
+  "status": true,
+  "message": "OK",
+  "data": [
+    {
+      "id": 5191418,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Proses Cek Berkas Petugas BO",
+      "ke_proses": "Verifikasi Kepala Seksi/ Subkoordinator",
+      "tgl_proses": "2025-03-24 09:44:58",
+      "keterangan_proses": "ok"
+    },
+    {
+      "id": 5191437,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Verifikasi Kepala Seksi/ Subkoordinator",
+      "ke_proses": "Berita Acara Pemeriksaan (BAP)",
+      "tgl_proses": "2025-03-24 09:46:37",
+      "keterangan_proses": "menyusun BAP"
+    },
+    {
+      "id": 5191489,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Berita Acara Pemeriksaan (BAP)",
+      "ke_proses": "Verifikasi Kepala Seksi/ Subkoordinator Setelah BAP/ Survey",
+      "tgl_proses": "2025-03-24 09:50:33",
+      "keterangan_proses": "berkas lengkap"
+    },
+    {
+      "id": 5191499,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Verifikasi Kepala Seksi/ Subkoordinator Setelah BAP/ Survey",
+      "ke_proses": "Verifikasi Kepala Bidang",
+      "tgl_proses": "2025-03-24 09:51:17",
+      "keterangan_proses": "berkas sesuai"
+    },
+    {
+      "id": 5191513,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Verifikasi Kepala Bidang",
+      "ke_proses": "Verifikasi Sekretaris",
+      "tgl_proses": "2025-03-24 09:52:28",
+      "keterangan_proses": "berkas lengkap"
+    },
+    {
+      "id": 5191518,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Verifikasi Sekretaris",
+      "ke_proses": "Verifikasi Kepala Dinas",
+      "tgl_proses": "2025-03-24 09:53:02",
+      "keterangan_proses": "berkas lengkap"
+    },
+    {
+      "id": 5191523,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Verifikasi Kepala Dinas",
+      "ke_proses": "Penomoran Surat Izin / Rekom",
+      "tgl_proses": "2025-03-24 09:53:32",
+      "keterangan_proses": "berkas sesuai"
+    },
+    {
+      "id": 5191652,
+      "id_t_permohonan_det": 1140402,
+      "nm_opd": "Dinas Kesehatan",
+      "nm_layanan": "Layanan Kesehatan",
+      "nm_ijin": "Sertifikat Baru Standar Toko Obat",
+      "dari_proses": "Penomoran Surat Izin / Rekom",
+      "ke_proses": "Berkas Dinyatakan Selesai ( SK telah Terbit )",
+      "tgl_proses": "2025-03-24 10:02:56",
+      "keterangan_proses": "ok"
+    }
+  ]
+}
